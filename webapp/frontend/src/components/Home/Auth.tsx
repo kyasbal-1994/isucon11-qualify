@@ -3,7 +3,7 @@ import Card from '/@/components/UI/Card'
 
 const Auth = () => {
   const click = async () => {
-    location.href = `http://localhost:5000?callback=${location.protocol}//${location.host}`
+    location.href = `http://jia.t.isucon.dev:5000?callback=${location.protocol}//${location.host}`
   }
 
   return (

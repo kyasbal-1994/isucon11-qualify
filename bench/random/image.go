@@ -1,7 +1,6 @@
 package random
 
 import (
-	"bytes"
 	"fmt"
 	"io/fs"
 	"io/ioutil"
@@ -10,9 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync/atomic"
-
-	"github.com/anthonynsimon/bild/adjust"
-	"github.com/anthonynsimon/bild/imgio"
 )
 
 const imageNum = 350
@@ -21,6 +17,7 @@ var index int32 = 0
 var images [imageNum][]byte
 
 func init() {
+	fmt.Println("Starting image.go init")
 	var files []fs.FileInfo
 
 	var err error
@@ -36,20 +33,12 @@ func init() {
 		for fileInfo.Name() == "default.jpg" || !strings.HasSuffix(fileInfo.Name(), ".jpg") {
 			fileInfo = files[rand.Intn(len(files))]
 		}
-		img, err := imgio.Open(filepath.Join(imageFolderPath, fileInfo.Name()))
+		imagePath := filepath.Join(imageFolderPath, fileInfo.Name())
+		byteArray, err := ioutil.ReadFile(imagePath)
 		if err != nil {
-			log.Fatalf("%+v", err)
+			panic("failed to read the image")
 		}
-		img = adjust.Brightness(img, float64(rand.Intn(20)-10)/10.0/2)
-		img = adjust.Contrast(img, float64(rand.Intn(20)-10)/10.0/2)
-		img = adjust.Gamma(img, 0.1+rand.Float64()*3)
-		img = adjust.Saturation(img, float64(rand.Intn(20)-10)/10.0/2)
-
-		//encode
-		buffer := new(bytes.Buffer)
-		encoder := imgio.JPEGEncoder(rand.Intn(95) + 5)
-		encoder(buffer, img)
-		images[i] = buffer.Bytes()
+		images[i] = byteArray
 	}
 }
 
